@@ -38,11 +38,11 @@ vim.filetype.add({
 })
 
 function M.setup(opts)
-	print('launchpad cfg: '..opts['key'])
+	local key = opts['key']
+	if key then key = key:gsub('[<>%s]', '') else key = 'F5' end
 	local group_name = 'nvim-launchpad'
 	vim.api.nvim_create_augroup(group_name, {clear=true})
 	vim.api.nvim_create_autocmd({'BufRead', 'BufNewFile'}, {pattern='*.nvim-launchpad', group=group_name, desc='creates <Enter> keymap to execute selected command', callback=function ()
-		print("launchpad buf read callback")
 		vim.keymap.set('n', '<Enter>', function ()
 			M.ExecLine(false)
 		end, {buffer=true, desc='[launchpad plugin] execute current line as Lua chunk'})
@@ -51,9 +51,9 @@ function M.setup(opts)
 		end, {buffer=true, desc='[launchpad plugin] execute current line as Lua chunk (alternative)'})
 	end})
 
-	vim.keymap.set('n', '<S-F5>', M.Open, {desc="[launchpad plugin] open launchpad window"})
-	vim.keymap.set('n', '<F5>', function() M.ExecLast(false) end, {desc='[launchpad plugin] execute last used command'})
-	vim.keymap.set('n', '<C-F5>', function() M.ExecLast(true) end, {desc='[launchpad plugin] execute last used command (alternative)'})
+	vim.keymap.set('n', '<S-'..key..'>', M.Open, {desc="[launchpad plugin] open launchpad window"})
+	vim.keymap.set('n', '<'..key..'>', function() M.ExecLast(false) end, {desc='[launchpad plugin] execute last used command'})
+	vim.keymap.set('n', '<C-'..key..'>', function() M.ExecLast(true) end, {desc='[launchpad plugin] execute last used command (alternative)'})
 end
 
 return M
