@@ -2,11 +2,12 @@ local M = {}
 
 local window_ids = {}
 local last_command = nil
-local pad_file_name = '_.nvim-launchpad'
+local pad_file_name = '_launchpad.lua'
+local pad_directory_func = vim.fn.getcwd
 
 local function open_pad_window()
     table.insert(window_ids, vim.api.nvim_open_win(
-        vim.fn.bufnr(pad_file_name, true),
+        vim.fn.bufnr(pad_directory_func()..'/'..pad_file_name, true),
         true,
         {relative='editor', row=5, col=5, border='single', height=10, width=150, title='[launchpad for `'..vim.uv.cwd()..'`]'}))
 end
@@ -79,11 +80,12 @@ end
 function M.setup(opts)
     opts = opts or {}
     if opts['key'] then key = opts.key:gsub('[<>%s]', '') end
+    if opts['location'] then pad_directory_func = opts.location end
     local group_name = 'nvim-launchpad'
     vim.api.nvim_create_augroup(group_name, { clear = true })
     vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' },
         {
-            pattern = '*.nvim-launchpad',
+            pattern = pad_file_name,
             group = group_name,
             desc = 'creates <Enter> keymap to execute selected command',
             callback = function(args)
@@ -91,7 +93,6 @@ function M.setup(opts)
                     write_help()
                 end
                 set_launchpad_buffer_mappings()
-                vim.o.filetype = 'lua'
             end
         })
 
